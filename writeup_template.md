@@ -224,28 +224,28 @@ def process_image_Ex(image):
     return draw_img
     ```
     
-```python
-class nVision():
-    '''
-    Residual Heatmap vision class help with filtering out false positives and duplicate detections.
-    '''
-    def __init__(self,n):
-        self.heatmaps=[]
-        self.memory=n
-           
-    def set_memory(self, n):
-        self.memory=n
-        
-    def capture_heatmap(self, heatmap):
-        self.heatmaps.append(heatmap)
-        if len(self.heatmaps) > self.memory:
-            self.heatmaps = self.heatmaps[len(self.heatmaps)-self.memory:]
+``` python
+        class nVision():
+            '''
+            Residual Heatmap vision class help with filtering out false positives and duplicate detections.
+            '''
+            def __init__(self,n):
+                self.heatmaps=[]
+                self.memory=n
+
+            def set_memory(self, n):
+                self.memory=n
+
+            def capture_heatmap(self, heatmap):
+                self.heatmaps.append(heatmap)
+                if len(self.heatmaps) > self.memory:
+                    self.heatmaps = self.heatmaps[len(self.heatmaps)-self.memory:]
+
+            def get_residual_vision(self):
+                return np.asarray(self.heatmaps).sum(axis=0)
             
-    def get_residual_vision(self):
-        return np.asarray(self.heatmaps).sum(axis=0)
-            
-            
-```
+    ```    
+
 ### Here are sample frames and their corresponding heatmaps:
 
 ![alt text][image5]
