@@ -96,12 +96,12 @@ I used Multiple regions of varying scale for window search (Multi-Scale). Here i
   ```
 2. I used multiple search regions of varying scale (Jupyter Notebook block : [86]). Below is the code I used to identify the the different search regions I used
 
-    # ystart  ystop   scale  step
-    # 400     480     1      15
-    # 400     530     1.5    30
-    # 400     560     2.0    45
-    # 400     660     2.5    60
-    # 400     550     3.0    75
+    #### ystart  ystop   scale  step
+    #### 400     480     1      15
+    #### 400     530     1.5    30
+    #### 400     560     2.0    45
+    #### 400     660     2.5    60
+    #### 400     550     3.0    75
     
     
 ```python
