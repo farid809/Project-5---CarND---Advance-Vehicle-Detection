@@ -173,14 +173,7 @@ def process_image_Ex(image):
     Vehicle_Detection=[]
     Vehicle_Detection_Flat=[]
     
-    #ystart  ystop   scale  step
-    #400     480     1      15
-    #400     530     1.5    30
-    #400     560     2.0    45
-    #400     660     2.5    60
-    #400     550     3.0    75
-    
-    
+    #Iterate through all the defined region and run sliding search using find_cars() 
     for region in scan_regions:
         ystart=region.ystart
         ystop=region.ystop
@@ -191,10 +184,8 @@ def process_image_Ex(image):
             out_img,box_list = find_cars(image, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins)
             Vehicle_Detection.append(box_list)
             ystart=ystart+step
-            #print(ystart)
-    
-
-    
+            
+     
     #Flattening the list
     #print(len(Vehicle_Detection))
     for sublist in Vehicle_Detection:
@@ -222,9 +213,13 @@ def process_image_Ex(image):
     cv2.putText(draw_img, 'Frame : {:.0f} '.format(frame_count), (50, draw_image.shape[0]-50), font, 1, fontColor, 1)
     frame_count+=1
     return draw_img
-    ```
+ 
+```
+
+The following class help with filtering false positives by storing heatmap for past n Frames and identifying false postives detection that spans only one or two frames.
     
-``` python
+```python
+        ##Jupyter Notebook "Project 5 - CarND - Advanced Vehicle Detection", block 66
         class nVision():
             '''
             Residual Heatmap vision class help with filtering out false positives and duplicate detections.
@@ -244,7 +239,7 @@ def process_image_Ex(image):
             def get_residual_vision(self):
                 return np.asarray(self.heatmaps).sum(axis=0)
             
-    ```    
+  ```    
 
 ### Here are sample frames and their corresponding heatmaps:
 
