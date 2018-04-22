@@ -141,11 +141,17 @@ Ultimately I searched on two scales using YCrCb 3-channel HOG features plus spat
 
 ![alt text][image4]
 ---
-
+https://youtu.be/eDbFndTHccI
 ### Video Implementation
 
 #### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (somewhat wobbly or unstable bounding boxes are ok as long as you are identifying the vehicles most of the time with minimal false positives.)
 Here's a [link to my video result](./project_video.mp4)
+
+
+##### CarND | Project 5 - CarND-Vehicle-Detection | Project Video
+
+<a href="https://www.youtube.com/watch?v=eDbFndTHccI&feature=youtu.be" target="_blank"><img src="http://img.youtube.com/vi/eDbFndTHccI/0.jpg" 
+alt="CarND-Vehicle-Detection | Project 5 Video" width="240" height="180" border="10" /></a>
 
 
 #### 2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
