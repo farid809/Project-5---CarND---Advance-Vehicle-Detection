@@ -163,10 +163,9 @@ Here's an example result showing the heatmap from a series of frames of video, t
 ```python
 #Jupyter Notebook "Project 5 - CarND - Advanced Vehicle Detection", block 86
 def process_image_Ex(image):
-    # NOTE: The output you return should be a color image (3 channel) for processing video below
-    # TODO: put your pipeline here,
-    # you should return the final output (image where lines are drawn on lanes)
-    # TODO: Build your pipeline that will draw lane lines on the test_images
+'''
+Main processing pipeline
+'''
     global frame_count
     global vehicles_detected
     
@@ -187,26 +186,29 @@ def process_image_Ex(image):
             
      
     #Flattening the list
-    #print(len(Vehicle_Detection))
     for sublist in Vehicle_Detection:
         for item in sublist:
                 Vehicle_Detection_Flat.append(item)
-    #print(len(Vehicle_Detection_Flat))
     
-   
+    #initialize heatmap with the same size as img
     heatmap_img = np.zeros_like(img[:,:,0])
  
-    
+    #generate heatmap for current frame from detected bounding boxes
     heatmap_img = add_heat(heatmap_img, Vehicle_Detection_Flat)
-    #print(np.amax(heatmap_img))
+   
+    #Store current heatmap for in vision_memory queue
     vision_memory.capture_heatmap(heatmap_img)
+    
+    #get residual heatmap by summing all heatmaps for past n frames
     heatmap_img = vision_memory.get_residual_vision()
     
-
+    #Filtering out transiet and false positive detection
     heatmap_img = apply_threshold(heatmap_img, 10)
     
-     
+    #use lable function to identify neighboring blobs 
     labels = label(heatmap_img)
+    
+    #finally draw the label bounding boxes for each detected label
     draw_img, rect = draw_labeled_bboxes(np.copy(image), labels)
     
 
