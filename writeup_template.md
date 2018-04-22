@@ -247,8 +247,7 @@ The following class help with filtering false positives by storing heatmap for p
 
 ![alt text][image5]
 
-### Here is the output of `scipy.ndimage.measurements.label()` on the integrated heatmap from all six frames:
-![alt text][image6]
+
 
 ### Here the resulting bounding boxes are drawn onto the last frame in the series:
 ![alt text][image7]
@@ -261,5 +260,17 @@ The following class help with filtering false positives by storing heatmap for p
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+Using SVM classifier and HOG based feature extraction provided satisfactory results for this project. However, this won't work well for real-time application due to the relatively low accuracy and the performance overhead introduced by the sliding window technique used in this pipeline. The current classifier used in my pipeline can still classify the none-car object as cars however this can be mitigated by the use of heat maps and calculating the residual heatmaps for past n frames and apply thresholds the removes false identifications. and possibly increase the accuracy by using more dataset for training the classifier. 
 
+Generally, the following improvements can be made:
+1. Further, tune the existing SVM classifier and train it with more datasets.
+2. Use Convolutional Neural networks instead of SVM (i.e. YOLOv3 model)
+3. Further Tune sliding window
+3. Use perspective transform technique to measure relative distance and  sizes of neighboring cars
+4. Tune sliding window algorithm to increase efficiency and decrease performance overhead.
+
+
+[References]
+1. Udacity Self-Driving Car Term1
+2. Implementing queue : https://www.pythoncentral.io/use-queue-beginners-guide/
+3. SVM : http://scikit-learn.org/stable/modules/svm.html
