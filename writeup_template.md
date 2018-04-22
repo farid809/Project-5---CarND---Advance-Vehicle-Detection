@@ -38,7 +38,7 @@ You're reading it!
 
 #### 1. Explain how (and identify where in your code) you extracted HOG features from the training images.
 
-The code for this step is contained in the first code cell of the IPython notebook (or in lines # through # of the file called `some_file.py`).  
+The code for this step is contained in code cells 24,25 and 26 of the IPython notebook (#Jupyter Notebook "Project 5 - CarND - Advanced Vehicle Detection")
 
 I started by reading in all the `vehicle` and `non-vehicle` images.  Here is an example of one of each of the `vehicle` and `non-vehicle` classes:
 
@@ -46,31 +46,64 @@ I started by reading in all the `vehicle` and `non-vehicle` images.  Here is an 
 
 I then explored different color spaces and different `skimage.hog()` parameters (`orientations`, `pixels_per_cell`, and `cells_per_block`).  I grabbed random images from each of the two classes and displayed them to get a feel for what the `skimage.hog()` output looks like.
 
-Here is an example using the `YCrCb` color space and HOG parameters of `orientations=8`, `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)`:
+Here is an example using the `YCrCb` color space and HOG parameters of `orientations=12`, `pixels_per_cell=18` and `cells_per_block=(2, 2)`:
 
 
 ![alt text][image2]
 
 #### 2. Explain how you settled on your final choice of HOG parameters.
 
-I tried various combinations of parameters and...
+I tried various combinations of parameters and settled on the below values which provided highest vehicle detection accuracy and less false positives. I used different color spaces and and tuned HOG parameters. Here are the parameters that worked best for me. (#Jupyter Notebook "Project 5 - CarND - Advanced Vehicle Detection", code block 26 and 27)
+
+```python
+color_space = 'YCrCb' # Can be RGB, HSV, LUV, HLS, YUV, YCrCb
+orient = 12  # HOG orientations
+pix_per_cell = 16 # HOG pixels per cell
+cell_per_block = 2 # HOG cells per block
+hog_channel = 'ALL' # Can be 0, 1, 2, or "ALL"
+spatial_size = (32, 32) # Spatial binning dimensions
+hist_bins = 32    # Number of histogram bins
+spatial_feat = True # Spatial features on or off
+hist_feat = True # Histogram features on or off
+hog_feat = True # HOG features on or off
+y_start_stop = [None, None] # Min and max in y to search in slide_window()
+```
+
 
 #### 3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 
-I trained a linear SVM using...
+I trained a linear SVM using the provided labeled data for vehicle and none-vehicle examples  (#Jupyter Notebook "Project 5 - CarND - Advanced Vehicle Detection", code block 28)
+
+```python
+# Use a linear SVC 
+svc = LinearSVC()
+# Check the training time for the SVC
+t=time.time()
+svc.fit(X_train, y_train)
+
+```
 
 ### Sliding Window Search
 
 #### 1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
 
-I decided to search random window positions at random scales all over the image and came up with this (ok just kidding I didn't actually ;):
+I used Multiple regions of varying scale for window search (Multi-Scale). Here is the approach i followed :
 
-I used Multiple regions of varying scale for window search (Multi-Scale). Here is the my approach.
-1. Restrict the search for the area in the image where cars might appear (function: find_cars)
+1. I restrict the search for the area in the image where cars might appear (function: find_cars jupyter notebook [49] )
+
   ```python
     img_tosearch = draw_img[ystart:ystop,600:draw_img.shape[1],:]
   ```
-2. Below are the different search regions i used
+2. I used multiple search regions of varying scale (Jupyter Notebook block : [86]). Below is the code I used to identify the the different search regions I used
+
+    # ystart  ystop   scale  step
+    # 400     480     1      15
+    # 400     530     1.5    30
+    # 400     560     2.0    45
+    # 400     660     2.5    60
+    # 400     550     3.0    75
+    
+    
 ```python
 
 class Scan_Region():
@@ -137,7 +170,24 @@ def process_image_Ex(image):
 
 #### 2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
 
-Ultimately I searched on two scales using YCrCb 3-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided a nice result.  Here are some example images:
+Ultimately I searched on two scales using YCrCb 3-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided a nice result. I used different color spaces and and tuned HOG parameters. Here are the parameters that worked best for me.
+
+```python
+color_space = 'YCrCb' # Can be RGB, HSV, LUV, HLS, YUV, YCrCb
+orient = 12  # HOG orientations
+pix_per_cell = 16 # HOG pixels per cell
+cell_per_block = 2 # HOG cells per block
+hog_channel = 'ALL' # Can be 0, 1, 2, or "ALL"
+spatial_size = (32, 32) # Spatial binning dimensions
+hist_bins = 32    # Number of histogram bins
+spatial_feat = True # Spatial features on or off
+hist_feat = True # Histogram features on or off
+hog_feat = True # HOG features on or off
+y_start_stop = [None, None] # Min and max in y to search in slide_window()
+```
+
+
+Here are some example images:
 
 ![alt text][image4]
 ---
@@ -156,7 +206,7 @@ alt="CarND-Vehicle-Detection | Project 5 Video" width="240" height="180" border=
 
 #### 2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
 
-I recorded the positions of positive detections in each frame of the video using the find_cars() function.  From the positive detections I created a heatmap for current frame and stored the current heatmap in vision_memory class that keep track of the heatmaps of the last n Frames. and then restrieved the residual heatmap for past n Frames using the vision_memory.get_residual_vision() function and finally thresholded that map to identify vehicle positions.  I then used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap.  I then assumed each blob corresponded to a vehicle.  I constructed bounding boxes to cover the area of each blob detected.  
+I recorded the positions of positive detections in each frame of the video using the find_cars() function. From the positive detections, I created a heat map for the current frame and stored the current heatmap in vision_memory class that keeps track of the heatmaps of the last n Frames. and then retrieved the residual heatmap for past n Frames using the vision_memory.get_residual_vision() function and finally thresholded that map to identify vehicle positions. I then used scipy.ndimage.measurements.label() to identify individual blobs in the heat map. I then assumed each blob corresponded to a vehicle. I constructed bounding boxes to cover the area of each blob detected.  
 
 Here's an example result showing the heatmap from a series of frames of video, the result of `scipy.ndimage.measurements.label()` and the bounding boxes then overlaid on the last frame of video:
 
