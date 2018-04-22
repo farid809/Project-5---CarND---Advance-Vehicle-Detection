@@ -160,7 +160,93 @@ I recorded the positions of positive detections in each frame of the video.  Fro
 
 Here's an example result showing the heatmap from a series of frames of video, the result of `scipy.ndimage.measurements.label()` and the bounding boxes then overlaid on the last frame of video:
 
-### Here are six frames and their corresponding heatmaps:
+```python
+#Jupyter Notebook "Project 5 - CarND - Advanced Vehicle Detection", block 86
+def process_image_Ex(image):
+    # NOTE: The output you return should be a color image (3 channel) for processing video below
+    # TODO: put your pipeline here,
+    # you should return the final output (image where lines are drawn on lanes)
+    # TODO: Build your pipeline that will draw lane lines on the test_images
+    global frame_count
+    global vehicles_detected
+    
+    Vehicle_Detection=[]
+    Vehicle_Detection_Flat=[]
+    
+    #ystart  ystop   scale  step
+    #400     480     1      15
+    #400     530     1.5    30
+    #400     560     2.0    45
+    #400     660     2.5    60
+    #400     550     3.0    75
+    
+    
+    for region in scan_regions:
+        ystart=region.ystart
+        ystop=region.ystop
+        scale=region.scale
+        step=region.step
+        
+        while ystart<ystop and ystop-ystart>step :
+            out_img,box_list = find_cars(image, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins)
+            Vehicle_Detection.append(box_list)
+            ystart=ystart+step
+            #print(ystart)
+    
+
+    
+    #Flattening the list
+    #print(len(Vehicle_Detection))
+    for sublist in Vehicle_Detection:
+        for item in sublist:
+                Vehicle_Detection_Flat.append(item)
+    #print(len(Vehicle_Detection_Flat))
+    
+   
+    heatmap_img = np.zeros_like(img[:,:,0])
+ 
+    
+    heatmap_img = add_heat(heatmap_img, Vehicle_Detection_Flat)
+    #print(np.amax(heatmap_img))
+    vision_memory.capture_heatmap(heatmap_img)
+    heatmap_img = vision_memory.get_residual_vision()
+    
+
+    heatmap_img = apply_threshold(heatmap_img, 10)
+    
+     
+    labels = label(heatmap_img)
+    draw_img, rect = draw_labeled_bboxes(np.copy(image), labels)
+    
+
+    cv2.putText(draw_img, 'Frame : {:.0f} '.format(frame_count), (50, draw_image.shape[0]-50), font, 1, fontColor, 1)
+    frame_count+=1
+    return draw_img
+    ```
+    
+```python
+class nVision():
+    '''
+    Residual Heatmap vision class help with filtering out false positives and duplicate detections.
+    '''
+    def __init__(self,n):
+        self.heatmaps=[]
+        self.memory=n
+           
+    def set_memory(self, n):
+        self.memory=n
+        
+    def capture_heatmap(self, heatmap):
+        self.heatmaps.append(heatmap)
+        if len(self.heatmaps) > self.memory:
+            self.heatmaps = self.heatmaps[len(self.heatmaps)-self.memory:]
+            
+    def get_residual_vision(self):
+        return np.asarray(self.heatmaps).sum(axis=0)
+            
+            
+```
+### Here are sample frames and their corresponding heatmaps:
 
 ![alt text][image5]
 
