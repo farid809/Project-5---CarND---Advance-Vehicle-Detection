@@ -16,7 +16,7 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 [image1]: ./examples/car_not_car.png
-[image2]: ./examples/HOG_example.jpg
+[image2]: ./examples/hog_visualization.png
 [image3]: ./examples/sliding_windows.jpg
 [image4]: ./examples/sliding_window.jpg
 [image5]: ./examples/bboxes_and_heat.png
@@ -65,7 +65,75 @@ I trained a linear SVM using...
 
 I decided to search random window positions at random scales all over the image and came up with this (ok just kidding I didn't actually ;):
 
-![alt text][image3]
+I used Multiple regions of varying scale for window search (Multi-Scale). Here is the my approach.
+1. Restrict the search for the area in the image where cars might appear (function: find_cars)
+  ```python
+    img_tosearch = draw_img[ystart:ystop,600:draw_img.shape[1],:]
+  ```
+2. Below are the different search regions i used
+```python
+
+class Scan_Region():
+    '''
+    scan region class define a unique scan region for sliding window 
+    '''
+    def __init__(self,_ystart,_ystop,_scale,_step):
+        self.ystart=_ystart
+        self.ystop=_ystop
+        self.scale=_scale
+        self.step=_step
+
+#Jupyter Notebook block : [86]
+scan_regions = []
+
+scan_regions.append(Scan_Region(400,480,1,15))
+scan_regions.append(Scan_Region(400,530,1.5,30))
+scan_regions.append(Scan_Region(400,560,2.0,45))
+scan_regions.append(Scan_Region(400,660,2.5,60))
+scan_regions.append(Scan_Region(400,660,3,75))
+scan_regions.append(Scan_Region(400,660,3.5,75))
+
+
+
+
+def process_image_Ex(image):
+    # NOTE: The output you return should be a color image (3 channel) for processing video below
+    # TODO: put your pipeline here,
+    # you should return the final output (image where lines are drawn on lanes)
+    # TODO: Build your pipeline that will draw lane lines on the test_images
+    global frame_count
+    global vehicles_detected
+    
+    Vehicle_Detection=[]
+    Vehicle_Detection_Flat=[]
+    
+    #ystart  ystop   scale  step
+    #400     480     1      15
+    #400     530     1.5    30
+    #400     560     2.0    45
+    #400     660     2.5    60
+    #400     550     3.0    75
+    
+    
+    for region in scan_regions:
+        ystart=region.ystart
+        ystop=region.ystop
+        scale=region.scale
+        step=region.step
+        
+        while ystart<ystop and ystop-ystart>step :
+            out_img,box_list = find_cars(image, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins)
+            Vehicle_Detection.append(box_list)
+            ystart=ystart+step
+            #print(ystart)
+    
+
+
+
+```
+
+<img src="./sliding_search_animation.gif" width="800" alt="Combined Image" /> 
+
 
 #### 2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
 
